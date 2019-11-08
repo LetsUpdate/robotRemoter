@@ -35,6 +35,25 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
         recyclerView.setAdapter(adapter);
         scanner = new Scanner_BTLE(this, this, -75);
         scanner.start();
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.start();
     }
 
     @Override
@@ -54,11 +73,6 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
 
         }
         Log.d("main", "Device name: " + device.getName() + " device rssi: " + new_rssi);
-        //devices.clear();
-
-
-
-        adapter.notifyDataSetChanged();
     }
 
 
