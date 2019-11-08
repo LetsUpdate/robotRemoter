@@ -12,17 +12,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.red.robotremoter.bluetooth.BTLE_Device;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private Context context;
-    private List<BTLE_Device> devices;
+    private HashMap<String, BTLE_Device> devices;
 
     {
 
     }
 
-    public RecyclerViewAdapter(Context context, List<BTLE_Device> devices) {
+    public RecyclerViewAdapter(Context context, HashMap<String, BTLE_Device> devices) {
         this.context = context;
         this.devices = devices;
 
@@ -38,8 +40,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.nameView.setText(devices.get(position).getName());
-        holder.macView.setText(devices.get(position).getAddress());
+        List<BTLE_Device> list = new ArrayList<>(devices.values());
+        holder.nameView.setText(list.get(position).getName());
+        holder.macView.setText(list.get(position).getAddress());
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

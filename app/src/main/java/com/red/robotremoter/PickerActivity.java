@@ -2,6 +2,8 @@ package com.red.robotremoter;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,16 +22,18 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
     RecyclerView recyclerView;
     RecyclerViewAdapter adapter;
     HashMap<String, BTLE_Device> deviceHashMap = new HashMap<>();
+    Scanner_BTLE scanner;
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picker);
         recyclerView = findViewById(R.id.list);
-        adapter = new RecyclerViewAdapter(this, devices);
+        adapter = new RecyclerViewAdapter(this, deviceHashMap);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        Scanner_BTLE scanner = new Scanner_BTLE(this, this, -75);
+        scanner = new Scanner_BTLE(this, this, -75);
         scanner.start();
     }
 
@@ -49,12 +53,24 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
             deviceHashMap.put(deviceMac, dev);
 
         }
-        //Log.d("main","Device name: "+device.getName()+" device rssi: "+new_rssi);
+        Log.d("main", "Device name: " + device.getName() + " device rssi: " + new_rssi);
         //devices.clear();
 
-        devices.add(new BTLE_Device(device));
 
 
         adapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //scanner.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        scanner.stop();
     }
 }
