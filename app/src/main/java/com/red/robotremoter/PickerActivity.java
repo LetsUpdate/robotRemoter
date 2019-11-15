@@ -33,6 +33,12 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
         setContentView(R.layout.activity_picker);
         list = findViewById(R.id.list);
         adapter = new ListAdapter(this, R.layout.list_element, devices);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplication(), devices.get(position).getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
         list.setAdapter(adapter);
 
         scanner = new Scanner_BTLE(this, this, -90);
@@ -40,12 +46,6 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
         handler = new Handler();
         updateList();
         scanner.start();
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplication(), devices.get(position).getName(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -83,9 +83,7 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
                 deviceHashMap.put(deviceMac, dev);
             }
         }
-
     }
-
 
     @Override
     protected void onResume() {
