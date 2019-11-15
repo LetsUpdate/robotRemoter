@@ -2,6 +2,7 @@ package com.red.robotremoter;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,7 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
 
     private RecyclerView recyclerView;
     private BLE_device_adapter adapter;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,19 +37,37 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
         recyclerView.setHasFixedSize(false);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-
+        // recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
         scanner = new Scanner_BTLE(this, this, -75);
         scanner.start();
+        handler = new Handler();
+        updateList();
     }
 
     @Override
     public void onScanStopped() {
+
+    }
+
+    private void updateList() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateList();
+            }
+        }, 5000);
         devices.clear();
         devices.addAll(deviceHashMap.values());
+        for (BTLE_Device a : devices
+        ) {
+
+
+            Log.d("asd", a.getName() + a.getAddress());
+        }
         adapter.notifyDataSetChanged();
     }
 
@@ -61,10 +81,7 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
             dev.setRSSI(new_rssi);
             deviceHashMap.put(deviceMac, dev);
         }
-        //devices.clear();
-        //devices.addAll( deviceHashMap.values());
-        //adapter.notifyDataSetChanged();
-        Log.d("main", "Device name: " + device.getName() + " device rssi: " + new_rssi);
+
     }
 
 

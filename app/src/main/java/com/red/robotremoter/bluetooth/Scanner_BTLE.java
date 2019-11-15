@@ -98,4 +98,5 @@ public class Scanner_BTLE {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
     }
+
 }
