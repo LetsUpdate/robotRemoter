@@ -77,17 +77,18 @@ public class Scanner_BTLE {
             Utils.toast(activity, "Starting BLE scan...");
 
             // Stops scanning after a pre-defined scan period.
-            /*mHandler.post(new Runnable() {
+/*            mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Utils.toast(ma.getApplicationContext(), "Stopping BLE scan...");
+                    Utils.toast(activity.getApplicationContext(), "Stopping BLE scan...");
 
                     mScanning = false;
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
 
-                    ma.stopScan();
+                    ma.onScanStopped();
                 }
-            });*/
+            },5000);*/
+
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
