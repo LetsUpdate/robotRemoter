@@ -36,7 +36,13 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplication(), devices.get(position).getName(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplication(), devices.get(position).getName(), Toast.LENGTH_SHORT).show();
+                if (devices.get(position).isConstainsUUID(MainActivity.UARTSERVICE_SERVICE_UUID)) {
+                    Toast.makeText(getApplicationContext(), "tartalmazza", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "nem tartalmazza", Toast.LENGTH_SHORT).show();
+                }
+                Toast.makeText(getApplicationContext(), MainActivity.UARTSERVICE_SERVICE_UUID, Toast.LENGTH_SHORT).show();
             }
         });
         list.setAdapter(adapter);
