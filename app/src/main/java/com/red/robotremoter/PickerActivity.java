@@ -4,11 +4,12 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.red.robotremoter.bluetooth.BTLE_Device;
 import com.red.robotremoter.bluetooth.Scanner;
@@ -22,30 +23,29 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
     private List<BTLE_Device> devices = new ArrayList<BTLE_Device>();
     private HashMap<String, BTLE_Device> deviceHashMap = new HashMap<>();
     private Scanner_BTLE scanner;
-
-    private RecyclerView recyclerView;
-    private BLE_device_adapter adapter;
+    ListAdapter adapter;
     private Handler handler;
+    private ListView list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picker);
+        list = findViewById(R.id.list);
+        adapter = new ListAdapter(this, R.layout.list_element, devices);
+        list.setAdapter(adapter);
 
-        adapter = new BLE_device_adapter(devices);
-        recyclerView = findViewById(R.id.list);
-        recyclerView.setHasFixedSize(false);
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        // recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-
-        scanner = new Scanner_BTLE(this, this, -75);
+        scanner = new Scanner_BTLE(this, this, -90);
         scanner.start();
         handler = new Handler();
         updateList();
+        scanner.start();
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplication(), devices.get(position).getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -59,13 +59,11 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
             public void run() {
                 updateList();
             }
-        }, 5000);
+        }, 1000);
         devices.clear();
         devices.addAll(deviceHashMap.values());
         for (BTLE_Device a : devices
         ) {
-
-
             Log.d("asd", a.getName() + a.getAddress());
         }
         adapter.notifyDataSetChanged();
@@ -74,12 +72,16 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
     @Override
     public void addDevice(BluetoothDevice device, int new_rssi) {
         String deviceMac = device.getAddress();
-        if (deviceHashMap.containsKey(device.getAddress())) {
-            deviceHashMap.get(deviceMac).setRSSI(new_rssi);
+        if (new_rssi < -80 && deviceHashMap.containsKey(deviceMac)) {
+            deviceHashMap.remove(deviceMac);
         } else {
-            BTLE_Device dev = new BTLE_Device(device);
-            dev.setRSSI(new_rssi);
-            deviceHashMap.put(deviceMac, dev);
+            if (deviceHashMap.containsKey(device.getAddress())) {
+                deviceHashMap.get(deviceMac).setRSSI(new_rssi);
+            } else {
+                BTLE_Device dev = new BTLE_Device(device);
+                dev.setRSSI(new_rssi);
+                deviceHashMap.put(deviceMac, dev);
+            }
         }
 
     }
@@ -88,7 +90,7 @@ public class PickerActivity extends AppCompatActivity implements Scanner {
     @Override
     protected void onResume() {
         super.onResume();
-        //scanner.start();
+        scanner.start();
     }
 
     @Override
